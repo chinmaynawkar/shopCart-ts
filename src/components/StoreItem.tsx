@@ -1,68 +1,104 @@
-import { Button, Card , CardBody} from "react-bootstrap"
-import { useShoppingCart } from "../context/ShoppingCartContext"
-import { formatCurrency } from "../utilities/formatCurrency"
 
-type StoreItemProps = {
-  id: number
-  name: string
-  price: number
-  imgUrl: string
-}
+import {
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useShoppingCart } from "../context/ShoppingCartContext";
+import { formatCurrency } from "../utilities/formatCurrency";
+
+export type StoreItemProps = {
+  id: number;
+  name: string;
+  price: number;
+  imgUrl: string;
+};
 
 export function StoreItem({ id, name, price, imgUrl }: StoreItemProps) {
-    const {
-      getItemQuantity,
-      increaseCartQuantity,
-      decreaseCartQuantity,
-      removeFromCart,
-    } = useShoppingCart()
-    const quantity = getItemQuantity(id)
+  const {
+    getItemQuantity,
+    adjustCartQuantity,
+    removeFromCart,
+  } = useShoppingCart();
+  const quantity = getItemQuantity(id);
 
-     return (
-    <Card className="h-100">
-      <Card.Img
-        variant="top"
+  return (
+    <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      
+      <img
         src={imgUrl}
-        height="200px"
-        style={{ objectFit: "cover" }}
+        alt={name}
+        style={{ width: "100%", height: "200px", objectFit: "cover" }}
       />
-                  <Card.Body className="d-flex flex-column">
-        <Card.Title className="d-flex justify-content-between align-items-baseline mb-4">
-          <span className="fs-2">{name}</span>
-          <span className="ms-2 text-muted">{formatCurrency(price)}</span>
-        </Card.Title>
+      <CardContent sx={{ flex: 1, overflow: "hidden" }}>
+        <Typography variant="h6" gutterBottom>
+          {name}
+        </Typography>
 
-                    <Card.Text className="text-muted">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                        Quisquam, voluptatum.
-                        </Card.Text>
-                        
-                        <div className="mt-auto">
-          {quantity === 0 ? (
-            <Button className="w-100" onClick={() => increaseCartQuantity(id)}>
-              + Add To Cart
-            </Button>
-          ) : (
-            <div
-              className="d-flex align-items-center flex-column"
-              style={{ gap: ".5rem" }}
+        <Typography
+          variant="body1"
+          color="textSecondary"
+          mb={2}
+          sx={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {formatCurrency(price)}
+        </Typography>
+      </CardContent>
+      <CardActions
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        {quantity === 0 ? (
+          <Button
+            variant="contained"
+            onClick={() => adjustCartQuantity(id,  1)}
+          >
+            <AddIcon /> Add To Cart
+          </Button>
+        ) : (
+          <div style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: ".5rem" }}>
+           
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center",
+               gap: ".5rem" }}>
+             
+              <IconButton onClick={() => adjustCartQuantity(id, -1)}>
+                <RemoveIcon />
+              </IconButton>
+              
+              <Typography variant="h5">{quantity}</Typography>
+              <IconButton onClick={() =>  adjustCartQuantity(id,  1)}> 
+                <AddIcon />
+              </IconButton>
+            </div>
+
+            <Button
+              variant="outlined"
+              onClick={() => removeFromCart(id)}
+              color="error"
+              startIcon={<DeleteIcon />}
             >
-              <div
-                className="d-flex align-items-center justify-content-center"
-                style={{ gap: ".5rem" }}
-              >
-
-             <Button onClick={() => decreaseCartQuantity (id)}>-</Button>
-             <div>
-                <span className="fs-3">{quantity}</span> : Qty
-             </div>
-                <Button onClick={()=> increaseCartQuantity(id)}>+</Button>
-                </div>
-                <Button onClick={() => removeFromCart(id)} variant="danger" className="w-100">Remove</Button>
-                </div>
-          )}
-        </div>
-      </Card.Body>
+              Remove
+            </Button>
+          </div>
+        )}
+      </CardActions>
     </Card>
   );
-} 
+}
